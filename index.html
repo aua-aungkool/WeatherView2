@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weather Forecast Map</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        html, body, h1, h2, h3, h4, h5 {
+            font-family: "Raleway", sans-serif;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            border: 1px solid darkslategrey;
+        }
+    </style>
+    <style>
+        /* เปลี่ยนสี tab เมนูด้านข้าง */
+        .sidebar-blue {
+            background-color: #007BFF; /* สีน้ำเงิน */
+            color: rgb(242, 177, 65); /* สีข้อความ */
+        }
+        .sidebar-blue .w3-bar-item {
+            color: rgb(242, 177, 65); /* เปลี่ยนสีข้อความในเมนูให้เป็นสีขาว */
+        }
+        .sidebar-blue .w3-bar-item:hover {
+            background-color: #0056b3; /* สีเมื่อวางเมาส์ */
+        }
+    </style>
+    <style>
+        /* ทำคำว่า dashboard ให้หนาขึ้น  */
+        .dashboard-title {
+            font-size: 24px; /* ขนาดตัวอักษร */
+            font-weight: bold; /* ตัวอักษรหนา */
+        }
+    </style>
+    <style>
+        /* กำหนดแถบเมนู */
+        .top-bar {
+            background-color: #FFA07A; /* สีแซลมอน */
+            padding: 23px; /* ขนาด padding */
+            position: fixed; /* ทำให้แถบอยู่ที่ด้านบนเสมอ */
+            top: 0; /* ตำแหน่งที่ล็อค */
+            left: 0; /* ตำแหน่งด้านซ้าย */
+            width: 100%; /* ขนาดเต็มหน้าจอ */
+            
+            z-index: 3000; /* ระดับชั้นสูงสุด */
+        }
+    </style>
+ <style>
+    /* เปลี่ยนสีเมื่อชี้เมนูเป็นสีแซลมอน */
+    .w3-bar-item:hover {
+        background-color: #FFA07A; /* สีแซลมอน */
+    }
+</style>
+
+<body class="w3-light-grey">
+    <!-- Top container -->
+    <div class="top-bar">
+        <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();">
+            <i class="fa fa-bars"></i> Menu
+        </button>
+        <span class="w3-bar-item w3-right"></span>
+    </div>
+
+    <!-- Sidebar/menu -->
+    <nav class="w3-sidebar w3-collapse w3-animate-left sidebar-blue" style="z-index:3;width:300px;" id="mySidebar"><br>
+        <div class="w3-container w3-row">
+            <div class="w3-col s4">
+                <img src="https://i.pinimg.com/736x/d9/d2/82/d9d282bfd1842ef06e706a12679e7e49.jpg" class="w3-circle w3-margin-right" style="width:65px">
+                <h5 class="dashboard-title">WeatherView</h5>
+            </div>   
+        </div>
+        <hr>
+        <div class="w3-container"></div>
+        <div class="w3-bar-block">
+            <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large" onclick="w3_close()" title="close menu">
+                <i class="fa fa-remove fa-fw"></i> Close Menu
+            </a>
+            <a href="#" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-cloud"></i> 7 day weather forecast</a>
+            <a href="#Map" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-map"></i> Map Weather Forecast</a>
+            <a href="#humidityChart" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-line-chart"></i> Line Chart</a>
+            <a href="#humidityDonut" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-pie-chart"></i> Donut chart</a>
+            <a href="table.html" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-table"></i> Weather forecast table</a>
+            <a href="settings.html" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-cog fa-fw"></i> Settings</a><br><br>
+        </div>
+    </nav>
+</body>
+
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+    <!-- Header -->
+    <iframe src="https://www.tmd.go.th/weatherForecast7DaysWidget?province=ภูเก็ต" height="400" width="950" scrolling="no" frameborder="0"></iframe>
+
+    <div class="w3-panel">
+        <div class="w3-row-padding" style="margin:0 -16px">
+            <div class="w3-third" id="Map">
+                <h5>Map Weather Forecast</h5>
+                <img src="/w3images/region.jpg" style="width:100%" alt="">
+            </div>
+            <!-- Map -->
+            <div class="w3-container">
+                <div id='map'>[loading the map...]</div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="w3-container">
+        <h5>General Stats</h5>
+        <p>เว็บแอปพลิเคชันแผนที่ออนไลน์สำหรับการพยากรณ์อากาศรายวันในประเทศไทยถูกออกแบบมาให้ใช้งานง่ายและมีประสิทธิภาพสูงในการติดตามสภาพอากาศตามสถานที่ต่างๆ แบบเรียลไทม์ ภายในเว็บประกอบด้วยแผนที่แบบโต้ตอบที่สามารถแสดงข้อมูลต่างๆ บนพื้นฐานของข้อมูลจากแหล่งที่เชื่อถือได้ เช่น OpenStreetMap และ Esri โดยมีโหมดแผนที่หลากหลายให้เลือกใช้ เช่น แผนที่สีเทาสำหรับดูพื้นที่ชัดเจนยิ่งขึ้น</p>
+    <p>แอปนี้ให้ผู้ใช้งานสามารถเลื่อนดูและซูมเข้า-ออกในแผนที่เพื่อดูรายละเอียดตามภูมิภาคต่างๆ ในประเทศไทย นอกจากนี้ยังมีตัวควบคุมเลเยอร์ที่ให้ผู้ใช้สลับไปมาระหว่างแผนที่และข้อมูลต่างๆ เช่น ข้อมูลสถานที่หรือพื้นที่พยากรณ์อากาศ แพลตฟอร์มนี้เหมาะสำหรับการติดตามสภาพอากาศในแต่ละวัน ไม่ว่าจะเป็นนักท่องเที่ยว ผู้เดินทาง หรือประชาชนทั่วไปที่ต้องการวางแผนกิจกรรมต่างๆ โดยสามารถใช้งานได้ผ่านอุปกรณ์ที่รองรับเบราว์เซอร์ทั่วไป</p>
+    </div>
+    </script>
+    <!--กราฟเส้น-->
+    <body>
+        <div class="w3-container">
+            <h3 style="text-align: center;">กราฟเเสดงค่าความชื้นรายชั่วโมง</h3>
+        </div>
+    </body>
+        <div id="humidityChart" style="width:100%;max-width:800px; margin: 0 auto;"></div>
+        <script>
+            const url1 = `https://api.weatherapi.com/v1/history.json?key=0d6ede3448ca49e88db165511242510&q=thailand&dt=2024-10-25`;
+    
+            // ดึงข้อมูลจาก API
+            fetch(url1)
+                .then(response => response.json())
+                .then(data => {
+                    // กำหนดตัวแปรข้อมูลช่วงเวลาและค่าความชื้น
+                    const timeValues = [];
+                    const humidityValues = [];
+                    //
+                    // ดึงข้อมูลช่วงเวลาต่าง ๆ ในแต่ละชั่วโมง
+                    data.forecast.forecastday[0].hour.forEach(hourData => {
+                        timeValues.push(hourData.time);
+                        humidityValues.push(hourData.humidity);
+                    });
+    
+                    // กำหนดข้อมูลสำหรับกราฟ
+                    const trace = {
+                        x: timeValues,
+                        y: humidityValues,
+                        type: 'scatter',          // ประเภทกราฟเส้น
+                        mode: 'lines+markers',    // แสดงเส้นและจุด
+                        marker: { color: 'blue' },
+                        name: 'Humidity (%)'
+                    };
+    
+                    const layout = {
+                        title: 'Humidity Levels Over Time',
+                        xaxis: { title: 'Time' },
+                        yaxis: { title: 'Humidity (%)' }
+                    };
+    
+                    // สร้างกราฟใน div ที่มี id เป็น "humidityChart"
+                    Plotly.newPlot('humidityChart', [trace], layout);
+                })
+                .catch(error => console.error('Error:', error));
+        </script>
+       <!--สรา้งโดนัท-->
+       <!--"กราฟแสดงการเปลี่ยนแปลงของค่าความชื้นสัมพัทธ์ในอากาศในแต่ละชั่วโมง ณ ประเทศไทย วันที่ 25 ตุลาคม 2567 ซึ่งช่วยให้เห็นแนวโน้มและช่วงเวลาที่ความชื้นในอากาศสูงหรือต่ำในระหว่างวัน"-->
+<!--"ข้อมูลนี้แสดงถึงความชื้นสัมพัทธ์ในอากาศรายชั่วโมง ซึ่งช่วยให้เข้าใจสภาพอากาศของวันที่ 25 ตุลาคม 2567 ในประเทศไทย และสามารถใช้ในการวางแผนกิจกรรมกลางแจ้งได้อย่างมีประสิทธิภาพ"-->
+<body>
+    <div class="w3-container">
+        <h5>กราฟเส้นแสดงความชื้นรายชั่วโมง</h5>
+        <ul>
+            <li>กราฟนี้แสดงการเปลี่ยนแปลงของค่าความชื้นสัมพัทธ์ในอากาศในแต่ละชั่วโมง ณ ประเทศไทย วันที่ 25 ตุลาคม 2567 ซึ่งช่วยให้เห็นแนวโน้มและช่วงเวลาที่ความชื้นในอากาศสูงหรือต่ำในระหว่างวัน</li>
+            <li>ข้อมูลดังกล่าวสามารถช่วยในการวางแผนกิจกรรมต่าง ๆ โดยให้ข้อมูลเกี่ยวกับสภาพอากาศของประเทศไทยในวันที่ 25 ตุลาคม 2567 ได้อย่างชัดเจนยิ่งขึ้น</li>
+        </ul>
+    </div>
+</body>
+
+        <div class="w3-container">
+            <h3 style="text-align: center;">กราฟเเสดงค่าความชื้นเฉลี่ย</h3></div>
+    </body>
+    <div id="humidityDonut" style="width:100%; max-width:800px; margin: 0 auto;"></div>
+    
+    <script>
+        async function fetchHumidityData() {
+            const url = 'https://api.weatherapi.com/v1/history.json?key=0d6ede3448ca49e88db165511242510&q=Thailand&dt=2024-10-28';
+    
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+    
+                const avgHumidity = data.forecast.forecastday[0].day.avghumidity;
+                const otherPercentage = 100 - avgHumidity;
+    
+                createDonutChart(avgHumidity, otherPercentage);
+            } catch (error) {
+                console.error('Error fetching humidity data:', error);
+            }
+        }
+    
+        function createDonutChart(avgHumidity, otherPercentage) {
+            const data = [{
+                values: [avgHumidity, otherPercentage],
+                labels: ['Average Humidity (%)', 'Other'],
+                type: 'pie',
+                hole: .4,
+                marker: {
+                    colors: ['#1f77b4', '#f4551b'] 
+                }
+            }];
+    
+            const layout = {
+                title: 'Average Humidity (%) on 2024-10-28',
+                annotations: [{
+                    text: 'Humidity',
+                    showarrow: false,
+                    font: {
+                        size: 20
+                    }
+                }]
+            };
+    
+            Plotly.newPlot('humidityDonut', data, layout);
+        }
+    
+        // เรียกใช้งานฟังก์ชัน fetchHumidityData
+        fetchHumidityData();
+    </script>    
+    <body>
+        <div class="w3-container">
+            <h5>กราฟโดนัทแสดงค่าความชื้นเฉลี่ยในประเทศไทย วันที่ 28 ตุลาคม 2567</h5>
+            <ul>
+                <li>กราฟโดนัทนี้แสดงค่าความชื้นสัมพัทธ์เฉลี่ยในอากาศประจำวันที่ 28 ตุลาคม 2567 ในประเทศไทย โดยมีการแบ่งพื้นที่แสดงเปอร์เซ็นต์ของค่าความชื้นและส่วนอื่น ๆ เพื่อแสดงให้เห็นถึงสภาพอากาศโดยรวมในวันนั้น ข้อมูลนี้สามารถช่วยในการวางแผนกิจกรรมต่าง ๆ และการเตรียมความพร้อมในสภาพอากาศที่ชื้นมากขึ้นหรือน้อย</li>
+                <li>ข้อมูลดังกล่าวสามารถช่วยในการวางแผนกิจกรรมต่าง ๆ โดยให้ข้อมูลเกี่ยวกับสภาพอากาศของประเทศไทยในวันที่ 25 ตุลาคม 2567 ได้อย่างชัดเจนยิ่งขึ้น</li>
+            </ul>
+        </div>
+    </body>
+<hr>
+<br>
+<div class="w3-container" style="background-color: #FFA07A; padding: 32px;">
+    <!-- เนื้อหาของคุณที่นี่ -->
+</div>
+
+</div>
+<!-- End page content -->
+<!--เรียกใช้ฟังก์ชันเพื่อดึงข้อมูลและสร้างกราฟ-->
+
+<script>
+    const apiKey = '5063cf3dfb2dcbb7ba6d6f005cabbbb2';
+    
+    // Cities data with coordinates
+    const cities = [
+        { name: 'Bangkok', lat: 13.7563, lon: 100.5018 },
+        { name: 'Chiang Mai', lat: 18.7883, lon: 98.9853 },
+        { name: 'Phuket', lat: 7.8804, lon: 98.3923 },
+        { name: 'Pattaya', lat: 12.9236, lon: 100.8825 },
+        { name: 'Khon Kaen', lat: 16.4419, lon: 102.8350 },
+        { name: 'Hat Yai', lat: 7.0083, lon: 100.4743 }
+    ];
+
+    let map;
+
+    window.onload = function() {
+        initializeMap();
+        cities.forEach(city => fetchWeather(city));
+        fetchWeatherData(); // Call to fetch weather data for chart
+    };
+
+    function initializeMap() {
+        map = L.map('map', {
+            center: [7.8804, 98.3923], // Centering to Phuket
+            zoom: 11,
+            layers: [gray_map] // Initialize with gray map
+        });
+    }
+
+    async function fetchWeather(city) {
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${apiKey}&units=metric`;
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            displayWeatherOnMap(city, data);
+        } catch (error) {
+            console.error("Request failed: ", error);
+        }
+    }
+
+    function displayWeatherOnMap(city, data) {
+        const weatherInfo = `
+            <h2>Weather in ${city.name}</h2>
+            <p><strong>Temperature:</strong> ${data.main.temp}°C</p>
+            <p><strong>Weather:</strong> ${data.weather[0].description}</p>
+            <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+            <p><strong>Wind Speed:</strong> ${data.wind.speed} m/s</p>
+        `;
+
+        const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        const weatherIcon = L.icon({
+            iconUrl: iconUrl,
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
+        });
+
+        const marker = L.marker([city.lat, city.lon], { icon: weatherIcon }).addTo(map);
+        marker.bindPopup(weatherInfo);
+    }
+</script>
+
+<!--สรา้งกราฟโดนัท-->
+<div id="myPlot" style="width:100%;max-width:700px"></div>
+<script>
+  const places = L.layerGroup(); // สร้าง layer group สำหรับเลเยอร์ที่คุณต้องการแสดง
+  
+  </script>
+  <script>
+    
+    // สร้างแผนที่เมื่อโหลดหน้าเสร็จ
+     window.onload = function() {
+    //ส่วนที่ขอพิกัดผู็ใช้
+        function showUserLocation(map) {
+        // Check if Geolocation API is supported by the browser
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                // Get the latitude and longitude from the user's position
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                // Create a marker for the user's position
+                const userMarker = L.marker([lat, lon]).addTo(map);
+
+                // Center the map to the user's position
+                map.setView([lat, lon], 12);
+
+                // Bind a popup to show the user's coordinates
+                userMarker.bindPopup(`<b>You are here!</b><br>Latitude: ${lat}<br>Longitude: ${lon}`).openPopup();
+            }, function (error) {
+                console.error("Error getting location: ", error.message);
+                alert("Unable to retrieve your location.");
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+     // Base Set
+  const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  });
+  const gray_map = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: '© <a href="https://www.esri.com">Esri</a> contributors'
+  });
+        // Initialize the map
+        const map = L.map('map', {
+            center: [13.7563, 100.5018],
+            zoom: 6,
+            layers: [gray_map] // Default layer
+        });
+
+        // เรียกใช้ฟังก์ชัน showUserLocation
+    showUserLocation(map);
+    
+        // Base map options for switching layers
+        const baseMaps = {
+            'แผนที่ฐาน OSM': osm,
+            'แผนที่สีเทา': gray_map
+        };
+    
+        // Add layer control to map
+        L.control.layers(baseMaps).addTo(map);
+    
+        // Fetch weather data and add markers for each city
+        async function fetchWeather(city) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${apiKey}&units=metric`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+    
+                if (response.ok) {
+                    displayWeatherOnMap(city, data);
+                } else {
+                    console.error("Error fetching data: ", data.message);
+                }
+            } catch (error) {
+                console.error("Request failed: ", error);
+            }
+        }
+    
+        // Display weather info on the map for each city
+        function displayWeatherOnMap(city, data) {
+            const weatherInfo = `
+                <h2>Weather in ${city.name}</h2>
+                <p><strong>Temperature:</strong> ${data.main.temp}°C</p>
+                <p><strong>Weather:</strong> ${data.weather[0].description}</p>
+                <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+                <p><strong>Wind Speed:</strong> ${data.wind.speed} m/s</p>
+            `;
+    
+            // Use OpenWeatherMap icon
+            const iconUrl = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+    
+            // Create a custom icon
+            const weatherIcon = L.icon({
+                iconUrl: iconUrl,
+                iconSize: [50, 50],
+                iconAnchor: [25, 50],
+                popupAnchor: [0, -50]
+            });
+    
+            // Add a marker with the appropriate icon for the city
+            const marker = L.marker([city.lat, city.lon], { icon: weatherIcon }).addTo(map);
+    
+            // Bind the weather info to a popup on the marker
+            marker.bindPopup(weatherInfo);
+        }
+    
+        // Fetch weather data for all cities
+        cities.forEach(city => fetchWeather(city));
+    };
+    </script>
+    
+  
+
+</body>
+</html>

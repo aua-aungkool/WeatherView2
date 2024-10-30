@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weather Forecast Map</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        html, body, h1, h2, h3, h4, h5 {
+            font-family: "Raleway", sans-serif;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            border: 1px solid darkslategrey;
+        }
+    </style>
+</head>
+<body class="w3-light-grey">
+
+<!-- Top container -->
+<div class="w3-bar w3-top w3-black w3-large" style="z-index:4000">
+    <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();">
+        <i class="fa fa-bars"></i> Menu
+    </button>
+    <span class="w3-bar-item w3-right">Logo</span>
+</div>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
+    <div class="w3-container w3-row">
+        <div class="w3-col s4">
+            <img src="/w3images/avatar2.png" class="w3-circle w3-margin-right" style="width:46px">
+        </div>   
+    </div>
+    <hr>
+    <div class="w3-container">
+        <h5>Dashboard</h5>
+    </div>
+    <div class="w3-bar-block">
+        <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu">
+            <i class="fa fa-remove fa-fw"></i> Close Menu
+        </a>
+        <a href="https://www.windy.com" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-users fa-fw"></i> open windy</a>
+        <a href="table.html" class="w3-bar-item w3-button w3-padding"><i class="fa fa-table"></i> Weather forecast table</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-users fa-fw"></i> Traffic</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bullseye fa-fw"></i> Geo</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-diamond fa-fw"></i> Orders</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bell fa-fw"></i> News</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bank fa-fw"></i> General</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-history fa-fw"></i> History</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-cog fa-fw"></i> Settings</a><br><br>
+    </div>
+</nav>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+    <!-- Header -->
+    <iframe src="https://www.tmd.go.th/weatherForecast7DaysWidget?province=ภูเก็ต" height="400" width="950" scrolling="no" frameborder="0"></iframe>
+
+    <div class="w3-panel">
+        <div class="w3-row-padding" style="margin:0 -16px">
+            <div class="w3-third">
+                <h5>Weather Forecast</h5>
+                <img src="/w3images/region.jpg" style="width:100%" alt="">
+            </div>
+            <!-- Map -->
+            <div class="w3-container">
+                <div id='map'>[loading the map...]</div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="w3-container">
+        <h5>General Stats</h5>
+        <p>เว็บแอปพลิเคชันแผนที่ออนไลน์สำหรับการพยากรณ์อากาศรายวันในประเทศไทยถูกออกแบบมาให้ใช้งานง่ายและมีประสิทธิภาพสูงในการติดตามสภาพอากาศตามสถานที่ต่างๆ แบบเรียลไทม์ ภายในเว็บประกอบด้วยแผนที่แบบโต้ตอบที่สามารถแสดงข้อมูลต่างๆ บนพื้นฐานของข้อมูลจากแหล่งที่เชื่อถือได้ เช่น OpenStreetMap และ Esri โดยมีโหมดแผนที่หลากหลายให้เลือกใช้ เช่น แผนที่สีเทาสำหรับดูพื้นที่ชัดเจนยิ่งขึ้น</p>
+    <p>แอปนี้ให้ผู้ใช้งานสามารถเลื่อนดูและซูมเข้า-ออกในแผนที่เพื่อดูรายละเอียดตามภูมิภาคต่างๆ ในประเทศไทย นอกจากนี้ยังมีตัวควบคุมเลเยอร์ที่ให้ผู้ใช้สลับไปมาระหว่างแผนที่และข้อมูลต่างๆ เช่น ข้อมูลสถานที่หรือพื้นที่พยากรณ์อากาศ แพลตฟอร์มนี้เหมาะสำหรับการติดตามสภาพอากาศในแต่ละวัน ไม่ว่าจะเป็นนักท่องเที่ยว ผู้เดินทาง หรือประชาชนทั่วไปที่ต้องการวางแผนกิจกรรมต่างๆ โดยสามารถใช้งานได้ผ่านอุปกรณ์ที่รองรับเบราว์เซอร์ทั่วไป</p>
+    </div>
+    </script>
+    <!--กราฟเส้น-->
+    <body>
+        <div class="w3-container">
+            <h3 style="text-align: center;">กราฟเเสดงค่าความชื้น</h3>
+        </div>
+    </body>
+        <div id="humidityChart" style="width:100%;max-width:800px; margin: 0 auto;"></div>
+        <script>
+            const url1 = `http://api.weatherapi.com/v1/history.json?key=0d6ede3448ca49e88db165511242510&q=thailand&dt=2024-10-25`;
+    
+            // ดึงข้อมูลจาก API
+            fetch(url1)
+                .then(response => response.json())
+                .then(data => {
+                    // กำหนดตัวแปรข้อมูลช่วงเวลาและค่าความชื้น
+                    const timeValues = [];
+                    const humidityValues = [];
+                    
+                    // ดึงข้อมูลช่วงเวลาต่าง ๆ ในแต่ละชั่วโมง
+                    data.forecast.forecastday[0].hour.forEach(hourData => {
+                        timeValues.push(hourData.time);
+                        humidityValues.push(hourData.humidity);
+                    });
+    
+                    // กำหนดข้อมูลสำหรับกราฟ
+                    const trace = {
+                        x: timeValues,
+                        y: humidityValues,
+                        type: 'scatter',          // ประเภทกราฟเส้น
+                        mode: 'lines+markers',    // แสดงเส้นและจุด
+                        marker: { color: 'blue' },
+                        name: 'Humidity (%)'
+                    };
+    
+                    const layout = {
+                        title: 'Humidity Levels Over Time',
+                        xaxis: { title: 'Time' },
+                        yaxis: { title: 'Humidity (%)' }
+                    };
+    
+                    // สร้างกราฟใน div ที่มี id เป็น "humidityChart"
+                    Plotly.newPlot('humidityChart', [trace], layout);
+                })
+                .catch(error => console.error('Error:', error));
+        </script>
+    </body>
+    <div id="myPlot" style="width:100%;max-width:100%;"></div>
+</div>
+<hr>
+<br>
+<div class="w3-container w3-dark-grey w3-padding-32">
+</div>
+<!-- End page content -->
+<!--เรียกใช้ฟังก์ชันเพื่อดึงข้อมูลและสร้างกราฟ-->
+
+<script>
+    const apiKey = '5063cf3dfb2dcbb7ba6d6f005cabbbb2';
+    
+    // Cities data with coordinates
+    const cities = [
+        { name: 'Bangkok', lat: 13.7563, lon: 100.5018 },
+        { name: 'Chiang Mai', lat: 18.7883, lon: 98.9853 },
+        { name: 'Phuket', lat: 7.8804, lon: 98.3923 },
+        { name: 'Pattaya', lat: 12.9236, lon: 100.8825 },
+        { name: 'Khon Kaen', lat: 16.4419, lon: 102.8350 },
+        { name: 'Hat Yai', lat: 7.0083, lon: 100.4743 }
+    ];
+
+    let map;
+
+    window.onload = function() {
+        initializeMap();
+        cities.forEach(city => fetchWeather(city));
+        fetchWeatherData(); // Call to fetch weather data for chart
+    };
+
+    function initializeMap() {
+        map = L.map('map', {
+            center: [7.8804, 98.3923], // Centering to Phuket
+            zoom: 11,
+            layers: [gray_map] // Initialize with gray map
+        });
+    }
+
+    async function fetchWeather(city) {
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${apiKey}&units=metric`;
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            displayWeatherOnMap(city, data);
+        } catch (error) {
+            console.error("Request failed: ", error);
+        }
+    }
+
+    function displayWeatherOnMap(city, data) {
+        const weatherInfo = `
+            <h2>Weather in ${city.name}</h2>
+            <p><strong>Temperature:</strong> ${data.main.temp}°C</p>
+            <p><strong>Weather:</strong> ${data.weather[0].description}</p>
+            <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+            <p><strong>Wind Speed:</strong> ${data.wind.speed} m/s</p>
+        `;
+
+        const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        const weatherIcon = L.icon({
+            iconUrl: iconUrl,
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
+        });
+
+        const marker = L.marker([city.lat, city.lon], { icon: weatherIcon }).addTo(map);
+        marker.bindPopup(weatherInfo);
+    }
+</script>
+
+<!--สรา้งกราฟโดนัท-->
+<div id="myPlot" style="width:100%;max-width:700px"></div>
+<script>
+   async function fetchWeatherHistory() {
+    const apiKey = '5063cf3dfb2dcbb7ba6d6f005cabbbb2'; // ใส่ API Key ของคุณที่นี่
+    const lat = 7.8804; // ละติจูดของภูเก็ต
+    const lon = 98.3923; // ลองจิจูดของภูเก็ต
+    const endDate = Math.floor(Date.now() / 1000); // วันปัจจุบันใน UNIX timestamp
+    const startDate = endDate - (7 + 1) * 24 * 60 * 60; // 7 วันย้อนหลัง (ไม่รวมวันนี้)
+
+    // เรียก API เพื่อดึงข้อมูลย้อนหลัง   `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${apiKey}&units=metric`
+    const response = await fetch(`https://history.openweathermap.org/data/2.5/history/city?lat=${lat}&lon=${lon}&type=hour&start=${startDate}&end=${endDate}&appid=${apiKey}`);    const weatherData = await response.json();
+    createDonutChart(weatherData);
+}
+
+function createDonutChart(weatherData) {
+    // ดึงข้อมูลอุณหภูมิสูงสุดย้อนหลัง 7 วัน
+    const maxTemps = {};
+
+    weatherData.list.forEach(item => {
+        const date = new Date(item.dt * 1000).toLocaleDateString(); // แปลง UNIX timestamp เป็นวันที่
+        if (!maxTemps[date] || item.main.temp_max > maxTemps[date]) {
+            maxTemps[date] = item.main.temp_max; // เก็บค่าอุณหภูมิสูงสุดในแต่ละวัน
+        }
+    });
+
+    // แปลงข้อมูลให้อยู่ในรูปแบบของกราฟ
+    const dates = Object.keys(maxTemps);
+    const temperatures = Object.values(maxTemps);
+    
+    // สร้างข้อมูลสำหรับ Donut Chart
+    const temperatureData = {
+        labels: dates,
+        values: temperatures,
+        hole: 0.4,
+        name: 'Max Temperature (°C)',
+        type: 'pie',
+    };
+
+    // กำหนด layout ของกราฟ
+    const layout = {
+        title: `อุณหภูมิสูงสุดในภูเก็ต - ย้อนหลัง 7 วัน`,
+        showlegend: true,
+    };
+
+    // สร้างกราฟ
+    Plotly.newPlot("myPlot", [temperatureData], layout);
+}
+
+// เรียกใช้ฟังก์ชันเพื่อดึงข้อมูลและสร้างกราฟ
+fetchWeatherHistory();
+    </script>
+    <!--
+   <div id="humidityChart" style="width:100%;max-width:700px"></div>
+   <script>
+
+       const url = `http://api.weatherapi.com/v1/history.json?key=0d6ede3448ca49e88db165511242510&q=thailand&dt=2024-10-25`;
+
+       // ดึงข้อมูลจาก API
+       fetch(url)
+           .then(response => response.json())
+           .then(data => {
+               // กำหนดตัวแปรข้อมูลช่วงเวลาและค่าความชื้น
+               const timeValues = [];
+               const humidityValues = [];
+               
+               // ดึงข้อมูลช่วงเวลาต่าง ๆ ในแต่ละชั่วโมง
+               data.forecast.forecastday[0].hour.forEach(hourData => {
+                   timeValues.push(hourData.time);
+                   humidityValues.push(hourData.humidity);
+               });
+
+               // กำหนดข้อมูลสำหรับกราฟ
+               const trace = {
+                   x: timeValues,
+                   y: humidityValues,
+                   type: 'scatter',          // ประเภทกราฟเส้น
+                   mode: 'lines+markers',    // แสดงเส้นและจุด
+                   marker: { color: 'blue' },
+                   name: 'Humidity (%)'
+               };
+
+               const layout = {
+                   title: 'Humidity Levels Over Time',
+                   xaxis: { title: 'Time' },
+                   yaxis: { title: 'Humidity (%)' }
+               };
+
+               // สร้างกราฟใน div ที่มี id เป็น "humidityChart"
+               Plotly.newPlot('humidityChart', [trace], layout);
+           })
+           .catch(error => console.error('Error:', error));
+   </script>
+-->
+<!--
+<script>
+    
+let exp = "Math.cos(x)";
+
+ Generate values
+const xValues = [];
+const yValues = [];
+for (let x = 0; x <= 10; x += 0.2) {
+  xValues.push(x);
+  yValues.push(eval(exp));
+}
+
+ Display using Plotly
+const data = [{x:xValues, y:yValues, mode:"markers"}];
+const layout = {title: "y = " + exp};
+ Plotly.newPlot("myPlot", data, layout);
+</script>
+-->
+
+<script>
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+</script>
+<script>
+  const places = L.layerGroup(); // สร้าง layer group สำหรับเลเยอร์ที่คุณต้องการแสดง
+  
+  </script>
+  <script>
+    
+    // สร้างแผนที่เมื่อโหลดหน้าเสร็จ
+     window.onload = function() {
+    //ส่วนที่ขอพิกัดผู็ใช้
+        function showUserLocation(map) {
+        // Check if Geolocation API is supported by the browser
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                // Get the latitude and longitude from the user's position
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                // Create a marker for the user's position
+                const userMarker = L.marker([lat, lon]).addTo(map);
+
+                // Center the map to the user's position
+                map.setView([lat, lon], 12);
+
+                // Bind a popup to show the user's coordinates
+                userMarker.bindPopup(`<b>You are here!</b><br>Latitude: ${lat}<br>Longitude: ${lon}`).openPopup();
+            }, function (error) {
+                console.error("Error getting location: ", error.message);
+                alert("Unable to retrieve your location.");
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+     // Base Set
+  const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  });
+  const gray_map = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: '© <a href="https://www.esri.com">Esri</a> contributors'
+  });
+        // Initialize the map
+        const map = L.map('map', {
+            center: [13.7563, 100.5018],
+            zoom: 6,
+            layers: [gray_map] // Default layer
+        });
+
+        // เรียกใช้ฟังก์ชัน showUserLocation
+    showUserLocation(map);
+    
+        // Base map options for switching layers
+        const baseMaps = {
+            'แผนที่ฐาน OSM': osm,
+            'แผนที่สีเทา': gray_map
+        };
+    
+        // Add layer control to map
+        L.control.layers(baseMaps).addTo(map);
+    
+        // Fetch weather data and add markers for each city
+        async function fetchWeather(city) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${apiKey}&units=metric`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+    
+                if (response.ok) {
+                    displayWeatherOnMap(city, data);
+                } else {
+                    console.error("Error fetching data: ", data.message);
+                }
+            } catch (error) {
+                console.error("Request failed: ", error);
+            }
+        }
+    
+        // Display weather info on the map for each city
+        function displayWeatherOnMap(city, data) {
+            const weatherInfo = `
+                <h2>Weather in ${city.name}</h2>
+                <p><strong>Temperature:</strong> ${data.main.temp}°C</p>
+                <p><strong>Weather:</strong> ${data.weather[0].description}</p>
+                <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+                <p><strong>Wind Speed:</strong> ${data.wind.speed} m/s</p>
+            `;
+    
+            // Use OpenWeatherMap icon
+            const iconUrl = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+    
+            // Create a custom icon
+            const weatherIcon = L.icon({
+                iconUrl: iconUrl,
+                iconSize: [50, 50],
+                iconAnchor: [25, 50],
+                popupAnchor: [0, -50]
+            });
+    
+            // Add a marker with the appropriate icon for the city
+            const marker = L.marker([city.lat, city.lon], { icon: weatherIcon }).addTo(map);
+    
+            // Bind the weather info to a popup on the marker
+            marker.bindPopup(weatherInfo);
+        }
+    
+        // Fetch weather data for all cities
+        cities.forEach(city => fetchWeather(city));
+    };
+    </script>
+    
+  
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>พยากรณ์อากาศล่วงหน้า 7 วัน</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          background-color: #f0f8ff; /* สีฟ้าอ่อน */
+          color: #333;
+          text-align: center;
+      }
+      table {
+          margin: 20px auto;
+          border-collapse: collapse;
+          width: 80%;
+          max-width: 800px;
+          background-color: #ffffff; /* สีพื้นหลังของตาราง */
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+      }
+      th, td {
+          border: 1px solid #ccc;
+          padding: 10px;
+          text-align: center;
+      }
+      th {
+          background-color: #ff7f50; /* สีแซลม่อน */
+      }
+      tr:nth-child(even) {
+          background-color: #f9f9f9; /* สีพื้นหลังแถวคู่ */
+      }
+      tr:hover {
+          background-color: #e0f7fa; /* สีพื้นหลังเมื่อเลื่อนเมาส์ */
+      }
+      button {
+          background-color: #007BFF; /* ปุ่มสีฟ้า */
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          margin-top: 20px;
+      }
+      button:hover {
+          background-color: #0056b3; /* สีฟ้าลงเข้มเมื่อวางเมาส์ */
+      }
+  </style>
+</head>
+<body>
+  <h1>พยากรณ์อากาศล่วงหน้า 7 วัน</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>วันที่</th>
+        <th>อุณหภูมิ (°C)</th>
+        <th>ความชื้น (%)</th>
+        <th>สภาพอากาศ</th>
+        <th>ไอคอน</th>
+      </tr>
+    </thead>
+    <tbody id="weatherTableBody">
+      <!-- ข้อมูลจะถูกเติมเข้าที่นี่โดยใช้ JavaScript -->	   
+    </tbody>
+  </table>
+  <button onclick="location.href='index.html'">กลับไปหน้าหลัก</button>
+  
+  <script>
+    const apiKey = '5063cf3dfb2dcbb7ba6d6f005cabbbb2'; // ใส่ API Key ของ OpenWeatherMap ที่นี่
+
+    async function fetchWeather(city) {
+        const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${city.lat}&lon=${city.lon}&appid=${apiKey}&units=metric`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            displayWeatherForecast(data);
+        } catch (error) {
+            console.error("Request failed: ", error);
+        }
+    }
+
+    function displayWeatherForecast(data) {
+        const weatherTableBody = document.getElementById("weatherTableBody");
+        weatherTableBody.innerHTML = ""; // ล้างข้อมูลเก่า
+
+        // ดึงข้อมูลพยากรณ์รายวัน
+        const forecastList = data.list.filter((entry, index) => index % 8 === 0); // ทุก 8 ช่วงเวลา (ประมาณ 1 วัน)
+
+        forecastList.forEach(forecast => {
+            const date = new Date(forecast.dt * 1000).toLocaleDateString("th-TH");
+            const temp = `${forecast.main.temp.toFixed(1)} °C`;
+            const humidity = `${forecast.main.humidity} %`;
+            const weatherDescription = forecast.weather[0].description;
+            const iconUrl = `https://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png`;
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${date}</td>
+                <td>${temp}</td>
+                <td>${humidity}</td>
+                <td>${weatherDescription}</td>
+                <td><img src="${iconUrl}" alt="${weatherDescription} icon"></td>
+            `;
+            weatherTableBody.appendChild(row);
+        });
+    }
+
+    fetchWeather({ lat: 7.8804, lon: 98.3923 }); // พิกัดของภูเก็ต
+  </script>
+</body>
+</html>
